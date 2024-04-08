@@ -1,0 +1,32 @@
+    <div class="nav justify-content-center" >
+      <a class="btn btn-primary" routerLink="/formulaire" role="button" style="margin-top: 5%;">Ajout Plainte</a><br>
+    </div>
+    <div class="table-responsive" class="nav justify-content-center">
+      <table class="table table-hover" id="monTableau">
+            <caption class="visually-hidden">Boosted tables basic look</caption>
+            <thead>
+                <tr>
+                    <th scope="col">DATE DE CREATION</th>
+                    <th scope="col">OBJET</th>
+                    <th scope="col">STATUT</th>
+                    <th scope="col">NUMERO</th>
+                    <th scope="col">DESCRIPTION</th>
+                    <th scope="col">TYPE</th>
+                    <th scope="col">PRIORITE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                    <tr (click)="goToPlainte()" *ngFor="let plainte of plaintes">
+                      <td>{{plainte.dateReception}}</td>
+                      <td>{{plainte.objet}}</td>
+                      <td>{{plainte.statut}}</td>
+                      <td>{{plainte.numeroClient}}</td>
+                      <td>{{plainte.description}}</td>
+                      <td>{{plainte.type}}</td>
+                      <td>{{plainte.priorite}}</td>
+                    </tr>
+
+                </tbody>    
+      </table>
+    </div>
