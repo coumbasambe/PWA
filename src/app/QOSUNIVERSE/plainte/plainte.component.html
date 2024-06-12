@@ -1,0 +1,180 @@
+<header
+  class="primary-header-container mat-elevation-z8"
+  >
+  <div class="tab-content">
+    <div class="container-fluid">
+      <div
+        class="row"
+        style="
+          background-color: black;
+          background-size: cover;
+          background-position: top center;
+        ">
+        <div class="col-md-12 text-center">
+          <h2 class="big-text"><b>QOS UNIVERSE</b></h2>
+          <h2 class="small-text"><b>{{currentGroup}}</b></h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="main-content">
+  <div class="row">
+    <div class="col-md-12">
+      <button
+      class="btn btn-primary btn-lg"
+      data-toggle="modal"
+      data-target="#modalPlainte">
+      <i class="material-icons">add</i> Nouvelle plainte
+    </button>
+    </div>
+  </div>
+  <app-admin_list *ngIf="profil==='ADMIN'"></app-admin_list>
+  <app-user_list *ngIf="profil==='SU'"></app-user_list>
+  <app-group_list *ngIf="profil==='GROUP'"></app-group_list>
+</div>
+<!-- Modals -->
+
+<!-- Modal d'ajout -->
+<div
+  class="modal fade"
+  id="modalPlainte"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="myModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header header_m">
+        <h6 class="modal-title">Ajouter une plainte</h6>
+        <button
+          mat-button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-hidden="true"
+        >
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Formulaire d'ajout de la plainte -->
+        <form #plainteForm="ngForm" class="form-horizontal">
+          <!-- Champs de saisie de la plainte -->
+          <div class="row">
+            <div class="col-md-6">
+              <!-- Champ de saisie de l'objet -->
+              <mat-form-field class="example-full-width">
+                <input matInput type="text" placeholder="Objet" name="objet" [(ngModel)]="plainte.objet" required/>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-6">
+              <!-- Champ de saisie du numéro client -->
+              <mat-form-field class="example-full-width">
+                <input matInput type="text" placeholder="Numéro client" name="numeroClient" [(ngModel)]="plainte.numeroClient" required/>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <!-- Champ de saisie de la description -->
+              <mat-form-field class="example-full-width">
+                <textarea matInput placeholder="Description" name="description" rows="5" [(ngModel)]="plainte.description" required></textarea>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="row">
+                <div class="col-md-6">
+                  <label for="priorite">Latitude</label>
+                  <input type="text" class="form-control white" id="latitude" [(ngModel)]="plainte.latitude" name="latitude" />
+                </div>
+                <div class="col-md-6">
+                  <label for="priorite">Longitude</label>
+                  <input type="text" class="form-control white" id="longitude" [(ngModel)]="plainte.longitude" name="longitude"/>
+                </div>
+          </div>
+
+          <div class="row">
+            <div class="form-group col-md-4">
+              <label for="domaine">Domaine</label>
+              <mat-select class="form-control white" id="domaine" [(ngModel)]="selectedDomaine.id" name="plainte.sousDomaine.domaine.domaine"
+                (selectionChange)="getSousDomainesByDomaine($event.value)"
+                (selectionChange)="getDomaineById(selectedDomaine.id)">
+                <mat-option *ngFor="let domaine of domaines" [value]="domaine.id">
+                  {{ domaine.domaine }}
+                </mat-option>
+              </mat-select>
+            </div>
+
+            <div class="form-group col-md-4">
+              <label for="sousDomaine">Sous Domaine</label>
+              <mat-select class="form-control white" id="sousDomaine" [(ngModel)]="plainte.sousDomaineId" name="sousDomaine"
+                (selectionChange)="getTypologiesBySousDomaineId(plainte.sousDomaineId)"
+                [disabled]="!selectedDomaine.id">
+                <mat-option *ngFor="let sousDomaine of sousDomaines" [value]="sousDomaine.id">
+                  {{ sousDomaine.sousDomaine }}
+                </mat-option>
+              </mat-select>
+            </div>
+
+            <div class="form-group col-md-4">
+              <label for="typologie">Typologie</label>
+              <mat-select class="form-control white" id="typologie" [(ngModel)]="plainte.typologieId" name="typologie" [disabled]="!selectedDomaine.id">
+                <mat-option *ngFor="let typologie of typologies" [value]="typologie.id">
+                  {{ typologie.nom }}
+                </mat-option>
+              </mat-select>
+          </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-md-6">
+              <label for="type">Type</label>
+              <mat-select class="form-control white" id="type" [(ngModel)]="plainte.typeId" name="type">
+                <mat-option *ngFor="let type of types"[value]="type.id">{{ type.type }}</mat-option>
+              </mat-select>
+            </div>
+
+            <div class="form-group col-md-6">
+              <label for="type">Origine</label>
+              <mat-select class="form-control white" id="origine" [(ngModel)]="plainte.origineId" name="origine">
+                <mat-option *ngFor="let origine of origines" [value]="origine.id">{{ origine.origine }}</mat-option>
+              </mat-select>
+            </div>
+          </div>
+          <!--FICHIER -->
+          <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12"><span class="text-warning">Pièces jointes: </span><br/><b>
+                      <div class="fileinput fileinput-new text-center" data-provides="fileinput">
+                        <div class="fileinput-preview fileinput-exists thumbnail"></div>
+                        <div>
+                            <span class="btn btn-info btn-file btn-sm">
+                              <input type="file" #file [multiple]="(maxFiles > 1)" id="input-file-now" (change) = "onFileChange($event)" class="dropify-fr"  /> joindre des fichiers
+                            </span>
+                        </div>
+                      </div>
+                    </b>
+                    </div>
+                  </div>
+            </div>
+        </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <!-- Bouton de validation du formulaire -->
+        <button mat-raised-button type="button" class="btn btn-success" data-dismiss="modal" [disabled]="!plainteForm.valid" (click)="postPlainte()">
+          Ajouter
+        </button>
+        <!-- Bouton d'annulation du formulaire -->
+        <button mat-raised-button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<router-outlet></router-outlet>
