@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
-import { QosUniverseService } from "src/app/shared/qos-universe-service.service";
+import { qosUniverseService } from "src/app/shared/qosUniverseService";
 @Injectable({
   providedIn: "root",
 })
 export class EmailService {
-  constructor(private qosUniverseService: QosUniverseService) {}
+  constructor(private qosUniverseService: qosUniverseService) {}
   postEmails(email) {
     return this.qosUniverseService.post('/qos-send-email',email);
   }

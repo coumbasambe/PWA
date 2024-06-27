@@ -2,30 +2,26 @@ import {
   Component,
   Input,
   OnInit,
-  QueryList,
-  ViewChildren,
 } from "@angular/core";
 import { Router } from "@angular/router";
-// import { DataTableDirective } from "angular-datatables";
 import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import { Plainte } from "../../models/plainte";
-import { Domaine } from "../../models/domaine";
-import { SousDomaine } from "../../models/sousDomaine";
-import { File } from "../../models/file";
-import { AuthService } from "src/app/pages/auth/auth.service";
-import { PlainteGroupe } from "../../models/plainteGroupe";
-import { Groupe } from "../../models/groupe";
 import { PlainteService } from "../services/plainte.service";
 import { DetailPlainteService } from "../services/detail-plaintes.service";
 import { DomaineService } from "../services/domaine.service";
 import { TypeService } from "../services/type.service";
+import { takeUntil } from "rxjs/operators";
+import { Plainte } from "../models/plainte";
 import { TypologieService } from "../services/typologies.service";
-import { PlainteGroupeService } from "../services/plainte-groupe.service";
-import { AgentService } from "../services/agent.service";
 import { EmailService } from "../services/email.service";
-import { Agent } from "../services/agent";
-
+import { Domaine } from "../models/domaine";
+import { SousDomaine } from "../models/sousDomaine";
+import { File } from "../models/file";
+import { AuthService } from "src/app/pages/auth/auth.service";
+import { PlainteGroupeService } from "../services/plainte-groupe.service";
+import { PlainteGroupe } from "../models/plainteGroupe";
+import { AgentService } from "../services/agent.service";
+import { Agent } from "../models/agent";
+import { Groupe } from "../models/groupe";
 
 @Component({
   selector: "app-plainte",
@@ -89,12 +85,6 @@ export class PlainteComponent implements OnInit {
   dtTrigger: Subject<any> = new Subject();
   alerte:number=0;
   emails:any;
-
-  dtOptionsAutres: any = {};
-  dtTriggerAutres: Subject<any> = new Subject();
-
-  // @ViewChildren(DataTableDirective)
-  // dtElements: QueryList<DataTableDirective>;
 
   plaintes: Plainte[] = [];
 
@@ -161,7 +151,7 @@ export class PlainteComponent implements OnInit {
 
   ngOnInit() {
     this.getDomaines();
-    this.getPlaintes();
+    // this.getPlaintes();
     this.getOrigines();
     this.getTypologies();
     this.getPriorites();
@@ -171,64 +161,64 @@ export class PlainteComponent implements OnInit {
     this.getPlainteGroupe();
     this.getGroupByGroupName();
     
-    let language = {
-      processing: "Traitement en cours...",
-      search: "Rechercher&nbsp;:",
-      lengthMenu: "Afficher _MENU_ &eacute;l&eacute;ments",
-      info: "Affichage des &eacute;lements _START_ &agrave; _END_ sur _TOTAL_ &eacute;l&eacute;ments",
-      infoEmpty:
-        "Affichage des &eacute;lements 0 &agrave; 0 sur 0 &eacute;l&eacute;ments",
-      infoFiltered: "(filtr&eacute; de _MAX_ &eacute;l&eacute;ments au total)",
-      infoPostFix: "",
-      loadingRecords: "Chargement en cours...",
-      zeroRecords: "Aucun &eacute;lement &agrave; afficher",
-      emptyTable: "Aucun &eacute;lement disponible dans le tableau",
-      paginate: {
-        first: "Premier",
-        previous: "Pr&eacute;c&eacute;dent",
-        next: "Suivant",
-        last: "Dernier",
-      },
-      aria: {
-        sortAscending: ": activer pour trier la colonne par ordre croissant",
-        sortDescending: ": activer pour trier la colonne par ordre décroissant",
-      },
-    };
-    let buttonsA = [
-      {
-        extend: "copy",
-        text: '<i class="material-icons">file_copy</i> Copier',
-        titleAttr: "Copier",
-      },
-      {
-        extend: "excel",
-        text: '<i class="material-icons">save_alt</i> Excel',
-        titleAttr: "Excel",
-        filename: function () {
-          return "Plaintes";
-        },
-      },
-    ];
-    this.dtOptions = {
-      pagingType: "full_numbers",
-      sorting: true,
-      pageLength: 50,
-      language: language,
-      order: [[0, "asc"]],
-      dom: "Bfrtip",
-      // Configure the buttons
-      buttons: buttonsA,
-    };
-    this.dtOptionsAutres = {
-      pagingType: "full_numbers",
-      sorting: true,
-      pageLength: 50,
-      language: language,
-      order: [[0, "asc"]],
-      dom: "Bfrtip",
-      // Configure the buttons
-      buttons: buttonsA,
-    };
+    // let language = {
+    //   processing: "Traitement en cours...",
+    //   search: "Rechercher&nbsp;:",
+    //   lengthMenu: "Afficher _MENU_ &eacute;l&eacute;ments",
+    //   info: "Affichage des &eacute;lements _START_ &agrave; _END_ sur _TOTAL_ &eacute;l&eacute;ments",
+    //   infoEmpty:
+    //     "Affichage des &eacute;lements 0 &agrave; 0 sur 0 &eacute;l&eacute;ments",
+    //   infoFiltered: "(filtr&eacute; de _MAX_ &eacute;l&eacute;ments au total)",
+    //   infoPostFix: "",
+    //   loadingRecords: "Chargement en cours...",
+    //   zeroRecords: "Aucun &eacute;lement &agrave; afficher",
+    //   emptyTable: "Aucun &eacute;lement disponible dans le tableau",
+    //   paginate: {
+    //     first: "Premier",
+    //     previous: "Pr&eacute;c&eacute;dent",
+    //     next: "Suivant",
+    //     last: "Dernier",
+    //   },
+    //   aria: {
+    //     sortAscending: ": activer pour trier la colonne par ordre croissant",
+    //     sortDescending: ": activer pour trier la colonne par ordre décroissant",
+    //   },
+    // };
+    // let buttonsA = [
+    //   {
+    //     extend: "copy",
+    //     text: '<i class="material-icons">file_copy</i> Copier',
+    //     titleAttr: "Copier",
+    //   },
+    //   {
+    //     extend: "excel",
+    //     text: '<i class="material-icons">save_alt</i> Excel',
+    //     titleAttr: "Excel",
+    //     filename: function () {
+    //       return "Plaintes";
+    //     },
+    //   },
+    // ];
+    // this.dtOptions = {
+    //   pagingType: "full_numbers",
+    //   sorting: true,
+    //   pageLength: 50,
+    //   language: language,
+    //   order: [[0, "asc"]],
+    //   dom: "Bfrtip",
+    //   // Configure the buttons
+    //   buttons: buttonsA,
+    // };
+    // this.dtOptionsAutres = {
+    //   pagingType: "full_numbers",
+    //   sorting: true,
+    //   pageLength: 50,
+    //   language: language,
+    //   order: [[0, "asc"]],
+    //   dom: "Bfrtip",
+    //   // Configure the buttons
+    //   buttons: buttonsA,
+    // };
   }
   
   getPlainteGroupe(){
@@ -386,17 +376,17 @@ export class PlainteComponent implements OnInit {
       };
   }
   
-  rerender(): void {
-    // if (this.dtElements) {
-    //   this.dtElements.forEach((dtElement: DataTableDirective) => {
-    //     if (dtElement && dtElement.dtInstance) {
-    //       // dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-    //       //   dtInstance.destroy();
-    //       // });
-    //     }
-    //   });
-    // }
-  }
+  // rerender(): void {
+  //   if (this.dtElements) {
+  //     this.dtElements.forEach((dtElement: DataTableDirective) => {
+  //       if (dtElement && dtElement.dtInstance) {
+  //         dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+  //           dtInstance.destroy();
+  //         });
+  //       }
+  //     });
+  //   }
+  // }
 
   goToPlainteDetails(plainteId: string): void {
     this.router.navigate(["qosUniverse/plainte", plainteId]);

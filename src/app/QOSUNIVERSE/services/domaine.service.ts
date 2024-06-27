@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
-import { QosUniverseService } from "src/app/shared/qos-universe-service.service";
+import { qosUniverseService } from "src/app/shared/qosUniverseService";
 @Injectable({
   providedIn: "root",
 })
 export class DomaineService {
-  constructor(private qosUniverseService: QosUniverseService) {}
+  constructor(private qosUniverseService: qosUniverseService) {}
 
   //Requêtes domaine
   getDomaines() {
@@ -27,13 +27,10 @@ export class DomaineService {
 
   // Requêtes sous-domaine
   getsousDomaine() {
-    return this.qosUniverseService.get("sous-domaines");
+    return this.qosUniverseService.get('sous-domaines?filter={"include": [{"relation": "domaine"}]}');
   }
   getOneSousDomaine(id) {
-    return this.qosUniverseService.get(
-      // "domaines/" + id + '?filter={"include": [{"relation": "domaine"} ]}'
-      "sous-domaines/" + id
-    );
+    return this.qosUniverseService.get("sous-domaines/" + id);
   }
   postSousDomaine(sousDomaine) {
     return this.qosUniverseService.post("sous-domaines", sousDomaine);

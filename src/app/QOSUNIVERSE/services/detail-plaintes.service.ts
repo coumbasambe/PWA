@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
-import { QosUniverseService } from "src/app/shared/qos-universe-service.service";
+import { qosUniverseService } from "src/app/shared/qosUniverseService";
 @Injectable({
   providedIn: "root",
 })
 export class DetailPlainteService {
-  constructor(private qosUniverseService: QosUniverseService) {}
+  constructor(private qosUniverseService: qosUniverseService) {}
 
   //Requêtes statut
   getStatut() {

@@ -34,7 +34,7 @@ export const AppRoutes: Routes = [
       },
       {
         path: 'qosUniverse',
-        loadChildren: () => import('./QOSUNIVERSE/qosuniverse.module').then(m => m.QOSUNIVERSEModule)
+        loadChildren: () => import('./QOSUNIVERSE/qosuniverse.module').then(m => m.QosUniverseModule)
       },
       {
         path: 'forms',

@@ -6,7 +6,7 @@ import {
   ViewChildren,
 } from "@angular/core";
 import { Router } from "@angular/router";
-import { DataTableDirective } from "angular-datatables";
+// import { DataTableDirective } from "angular-datatables";
 import { Subject } from "rxjs";
 import { PlainteService } from "../services/plainte.service";
 import { Plainte } from "../models/plainte";
@@ -16,6 +16,8 @@ import { AuthService } from "src/app/pages/auth/auth.service";
 import { AgentService } from "../services/agent.service";
 import { Agent } from "../models/agent";
 import * as moment from "moment";
+
+declare const $: any;
 
 @Component({
   selector: "app-group_list",
@@ -88,8 +90,8 @@ export class GroupListComponent implements OnInit {
   plaintesNonPrevu = '-';
   plaintesEnAttente = '-';
   
-  @ViewChildren(DataTableDirective)
-  dtElements: QueryList<DataTableDirective>;
+  // @ViewChildren(DataTableDirective)
+  // dtElements: QueryList<DataTableDirective>;
 
   plaintes: Plainte[] = [];
   plainteGroupes: PlainteGroupe[] = [];
@@ -218,10 +220,12 @@ export class GroupListComponent implements OnInit {
       this.plaintesPrequalifier = res.filter((groupePlainte) => groupePlainte.statut.statut === 'NON PRIS EN CHARGE').length;
       this.plaintesCloturees = res.filter((groupePlainte) => groupePlainte.statut.statut === 'TRAITE').length;
       
-      this.dtTrigger.next();
-      this.dtTriggerAutres.next();
+      this.dtTrigger.next(null);
+      this.dtTriggerAutres.next(null);
       this.ready = true;
       this.searching = false;
+      this.reinitializeNPECDataTable()
+      this.reinitializeOuvertDataTable()
     })
   }
   
@@ -229,5 +233,27 @@ export class GroupListComponent implements OnInit {
     this.router.navigate(["qosUniverse/plainte", plainteId]);
   }
 
+  private reinitializeNPECDataTable(): void {
+    // Destroy existing DataTable instance
+    const table = $('#npec-table').DataTable();
+    if (table) {
+      table.clear().destroy();
+    }
+    // Reinitialize DataTable after a short delay to ensure Angular has updated the view
+    setTimeout(() => {
+      $('#npec-table').DataTable(this.dtOptions);
+    }, 100);
+  }
+  private reinitializeOuvertDataTable(): void {
+    // Destroy existing DataTable instance
+    const table = $('#ouvert-table').DataTable();
+    if (table) {
+      table.clear().destroy();
+    }
+    // Reinitialize DataTable after a short delay to ensure Angular has updated the view
+    setTimeout(() => {
+      $('#ouvert-table').DataTable(this.dtOptionsAutres);
+    }, 100);
+  }
  
 }

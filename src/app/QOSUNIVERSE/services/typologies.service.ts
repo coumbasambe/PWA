@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
-import { QosUniverseService } from "src/app/shared/qos-universe-service.service";
+import { qosUniverseService } from "src/app/shared/qosUniverseService";
 @Injectable({
   providedIn: "root",
 })
 export class TypologieService {
-  constructor(private qosUniverseService: QosUniverseService) {}
+  constructor(private qosUniverseService: qosUniverseService) {}
 
   //Requêtes typologie
   getTypologie() {

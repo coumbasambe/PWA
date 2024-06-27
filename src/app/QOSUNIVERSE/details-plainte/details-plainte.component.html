@@ -1,0 +1,1410 @@
+<div class="main-content">
+  <div class="col-md-12">
+    <p><a (click)="goBack()" style="cursor: pointer; color: #ef6c00;">Liste des plaintes > </a>Plainte
+      {{plainte?.objet}}</p>
+  </div>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header card-header-warning card-header-icon">
+          <div class="card-icon">
+            <i class="material-icons">info_i</i>
+          </div>
+          <h3 style="margin-top: 10px; margin-bottom: 30px ;color: black;">Détails Plainte</h3>
+        </div>
+        <div class="card-body">
+
+          <div class="row" style="font-size: 17px;">
+            <div class="col-md-4">
+              <b style="font-weight: bold;">OBJET : </b> <b>[#{{plainte.plainteNumber}}]. {{ plainte.objet }}</b>
+            </div>
+            <div class="col-md-4" *ngIf="plainte.numeroClient">
+              <b style="font-weight: bold;">NUMERO CLIENT : </b> <b>{{ plainte.numeroClient }}</b>
+            </div>
+            <div class="col-md-4" *ngIf="plainte">
+              <b style="font-weight: bold;">LAT : </b> <b>{{plainte.latitude ? plainte.latitude : '-'}}</b>
+            </div>
+          </div>
+          <div class="row" style="font-size: 17px;">
+            <div class="col-md-4">
+              <b style="font-weight: bold;">EXPEDITEUR : </b> <b>{{ plainte.expediteur }}</b>
+            </div>
+            <div class="col-md-4">
+              <b style="font-weight: bold;">DATE RECEPTION : </b>
+              <b>{{ plainte.dateReception | date : "dd/MM/yyyy HH:mm" }}</b>
+            </div>
+            <div class="col-md-4">
+              <b style="font-weight: bold;">LON : </b> <b>{{plainte.longitude ? plainte.longitude : '-'}}</b>
+            </div>
+          </div>
+          <div class="d-flex mt-3">
+            <div class="row ml-auto">
+              <div class="col-md-3" *ngIf="profil !='SU' && profil !='GROUP'">
+                <button mat-raised-button type="button" class="btn btn-large btn-warning" data-toggle="modal"
+                  data-target="#mapAction">
+                  <span class="material-symbols-outlined">
+                    pin_drop
+                  </span>
+                </button>
+              </div>
+              <div class="col-md-3 ml-5" *ngIf="profil !='SU'">
+                <button [disabled]="!plainte.latitude || !plainte.longitude" mat-raised-button type="button"
+                  class="btn btn-large btn-info" data-dismiss="modal" (click)="gotoMap()" style="height: 48px;">
+                  <i class="material-icons">map</i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header card-header-default card-header-icon">
+          <div class="card-icon">
+            <i class="material-symbols-outlined">network_intelligence_update</i>
+          </div>
+          <h3 style="margin-top: 10px; margin-bottom: 30px ;color: black;">XamXam AI</h3>
+        </div>
+        <div class="card-body">
+          <div class="row" style="font-size: 17px;">
+            <div class="card-body text-dark" style="background-color:#dcdcdc;margin-top: -30px;">
+              <p [@textAnimation]="textState"
+                style="white-space: pre-line;font-size: 16px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
+                {{ animatedText }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!--ETAT D AVANCEMENTS-->
+    <div class="col-md-6">
+      <div class="col-md-12 mt-5">
+        <div class="card">
+          <div class="card-header card-header-warning card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">show_chart</i>
+            </div>
+
+            <h3 class="card-title">Avancements</h3>
+            <div class="col-md-12" style="margin-top: 50px; font-size: 17px">
+              <form #addMessageForm="ngForm">
+                <div class="row">
+                  <div class="col-md-12">
+                    <mat-form-field class="example-full-width" style="color: black;">
+                      <textarea matInput placeholder="Message" name="message" [(ngModel)]="message.message"
+                        required></textarea>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-1 mt-3">
+                    <button class="btn btn-info btn-lg" (click)="postMessage()"
+                      [disabled]="!addMessageForm.valid || plainte?.statut?.statut === 'FERME'">Envoyer</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="card-body" style="height: 875px; overflow-y: auto;">
+            <div class="card-body box text-dark mt-2" style="background-color: #00bcd4;"
+              *ngIf="plainte?.statut?.statut==='FERME' && plainte?.retourClient">
+              <h4><b style="font-weight: bold;">Retour Client </b></h4>
+              <p class="fw-bold"
+                style="font-size: 15px; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;">
+                {{plainte?.retourClient}}</p>
+            </div>
+
+            <div class="card-body box text-dark mt-3" style="background-color: rgb(229, 229, 248);"
+              *ngIf="plainte?.statut?.statut==='FERME' && plainte?.cause">
+              <h4><b style="font-weight: bold;">Cause </b></h4>
+              <p class="fw-bold"
+                style="font-size: 15px; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;">
+                {{plainte?.cause}}</p>
+            </div>
+
+            <div class="card-body box text-dark mt-3" style="background-color: rgb(229, 229, 248);"
+              *ngIf="(plainte?.statut?.statut==='FERME' || plainte?.statut?.statut==='EN ATTENTE' || plainte?.statut?.statut==='NON PREVU') && plainte?.actions ">
+              <h4><b style="font-weight: bold;">Actions Correctives </b></h4>
+              <p class="fw-bold"
+                style="font-size: 15px; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;">
+                {{plainte?.actions}}</p>
+            </div>
+
+            <div class="card-body box text-dark mt-3" style="background-color: rgb(229, 229, 248);"
+              *ngIf="(plainte?.statut?.statut==='FERME' || plainte?.statut?.statut==='EN ATTENTE' || plainte?.statut?.statut==='NON PREVU') && plainte?.groupePorteurId ">
+                <h4>
+                  <b style="font-weight: bold;">
+                    <p class="fw-bold;" style="font-weight: bold;"> Porteur : {{ plainte?.groupePorteurId && listGroupes?.length ? getGroupePorteur()?.nomGroupe : '-'}}</p>
+                  </b>
+                </h4>
+                <h4>
+                  <b style="font-weight: bold;">
+                    Délai :
+                    <span class="fw-bold text-dark;"
+                      style="font-size: 15px; font-family: Verdana, Geneva, Tahoma, sans-serif;">{{
+                      plainte?.delai | date : "dd/MM/yyyy HH:mm:ss"
+                      }}</span>
+                  </b>
+                </h4>
+                <h4 *ngIf="(plainte?.statut?.statut==='FERME') && plainte?.site ">
+                  <p class="fw-bold;" style="font-weight: bold;"> site : {{ plainte?.site}}</p>
+                </h4>
+            </div>
+
+            <!-- <div class="card-body box text-dark mt-3" style="background-color: rgb(229, 229, 248);"
+            *ngIf="(plainte?.statut?.statut==='FERME') && plainte?.site ">
+            <h4><b style="font-weight: bold;">Site </b></h4>
+            <p class="fw-bold"
+              style="font-size: 15px; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;">
+              {{plainte?.site}}</p>
+          </div> -->
+
+            <div class="card box" *ngFor="let message of messages">
+              <div class="card-body text-dark"
+                [ngStyle]="{'background-color': (message.type=='USER') ? 'rgb(241, 181, 134)' :  (message.type=='SYSTEM') ? '#DCDCDC' : '#f5f5f5'}">
+                <h4>
+                  <b style="font-weight: bold;">
+                    Date:
+                    <span class="fw-bold text-dark;"
+                      style="font-size: 15px; font-family: Verdana, Geneva, Tahoma, sans-serif;">{{
+                      message.date | date : "dd/MM/yyyy HH:mm:ss"
+                      }}</span>
+                  </b>
+                </h4>
+                <h4>
+                  <b style="font-weight: bold;">
+                    <p class="fw-bold;" style="font-weight: bold;"> De : {{message.de}}</p>
+                  </b>
+                </h4>
+                <p style="font-size: 15px; font-family: Verdana, Geneva, Tahoma, sans-serif;"
+                  [innerHTML]="message.message"></p>
+              </div>
+            </div>
+            <div class="card-body box text-dark" style="background-color: #ffffff;border:1px solid black">
+              <h4><b style="font-weight: bold; margin-right: 20px;">Description</b></h4>
+              <p class="fw-bold"
+                style="font-size: 15px; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;"
+                [innerHTML]="plainte.description"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--PARTIE ACTIONS-->
+    <div class="col-md-6" style="width: 550px;">
+      <div class="col-md-12 mt-5">
+        <div class="card">
+          <div class="card-header card-header-warning card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">sort</i>
+            </div>
+            <h3 class="card-title"> Qualifications</h3>
+            <div class="card-body">
+              <div class="alert alert-warning" role="alert"
+                *ngIf="plainte?.statut?.statut == 'NON PRIS EN CHARGE' && plainte.affecterA && plainte.affecterA != accountId">
+                <h6> <img src="../../../assets/img/alertImg.webp" width="20px" height="20px"> Attention: Cette plainte
+                  est affectée à {{jambarsAgent?.prenom}} {{jambarsAgent?.nom}} ({{jambarsAgent?.username}})</h6>
+              </div>
+              <div class="card-footer text-end">
+                <div class="dropdown"
+                  *ngIf="plainte && plainte?.statut?.statut === 'NON PRIS EN CHARGE' && profil =='ADMIN'">
+                  <button mat-raised-button href="#" class="dropdown-toggle btn btn-primary btn-large"
+                    matTooltip="Dispatcher la plainte" [matTooltipShowDelay]="1" [matTooltipHideDelay]="2"
+                    aria-label="Button that displays a tooltip with a customized delay in showing and hiding"
+                    data-toggle="dropdown">
+                    <span class="material-symbols-outlined">share</span>
+                    <b class="caret"></b>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-left">
+                    <li class="dropdown-header">Liste des Agents</li>
+                    <li *ngFor="let agent of agents">
+                      <a data-toggle="dropdown" (click)="dispatcherPlainte(agent)">{{agent.jambarsInfos?.prenom}}
+                        {{agent.jambarsInfos?.nom}} </a>
+                    </li>
+                  </ul>
+                </div>
+                <div class="dropdownll"
+                  *ngIf="plainte && plainte?.statut?.statut != 'NON PRIS EN CHARGE' && profil =='ADMIN'">
+                  <button *ngIf=" (plainte?.statut?.statut != 'TRANSFERE')" mat-raised-button href="#"
+                    class="dropdown-toggle btn btn-primary btn-large" matTooltip="Activer un groupe"
+                    [matTooltipShowDelay]="1" [matTooltipHideDelay]="2"
+                    aria-label="Button that displays a tooltip with a customized delay in showing and hiding"
+                    data-toggle="dropdown"
+                    [disabled]="plainte?.statut?.statut === 'FERME' || plainte?.statut?.statut === 'EN ATTENTE'">
+                    <span class="material-symbols-outlined">send</span>
+                    <b class="caret"></b>
+                  </button>
+
+                  <button *ngIf="plainte?.statut?.statut === 'TRANSFERE'" mat-raised-button
+                    matTooltip="Récupérer la plainte" data-toggle="modal" data-target="#modalRecupererPlainte"
+                    class="btn btn-primary btn-large">
+                    <span class="material-symbols-outlined">sync</span>
+                  </button>
+
+                  <button mat-raised-button matTooltip="Fermer la plainte" href="#" data-toggle="modal"
+                    data-target="#modalFermerPlainte" class="btn btn-primary btn-large"
+                    [disabled]=" (plainte?.statut?.statut === 'TRANSFERE')"
+                    *ngIf="(plainte?.statut?.statut != 'NON PRIS EN CHARGE') && (plainte?.statut?.statut != 'FERME')&& (plainte?.statut?.statut != 'EN ATTENTE')">
+                    <span class="material-symbols-outlined">close</span>
+                  </button>
+                  <button mat-raised-button matTooltip="Réouvrir la pliante" href="#" data-toggle="modal"
+                    data-target="#modalReOuvrirPlainte" class="btn btn-primary btn-large"
+                    *ngIf="plainte?.statut?.statut === 'FERME' || plainte?.statut?.statut === 'EN ATTENTE'">
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                  <!-- modifier les plaintes clotuter -->
+                  <button mat-raised-button matTooltip="Modifier la pliante" href="#" data-toggle="modal"
+                    data-target="#modificationPlainte" class="btn btn-primary btn-large"
+                    *ngIf="profil === 'ADMIN' && (plainte?.statut?.statut === 'FERME')">
+                    <!-- mettre a jour -->
+                    <span class="material-symbols-outlined">update</span>
+                  </button>
+                  <!-- modifier les plaintes clotuter -->
+
+                  <ul class="dropdown-menu dropdown-menu-left">
+                    <li class="dropdown-header">Liste des groupes</li>
+                    <li *ngFor="let groupe of groupes">
+                      <a data-toggle="modal" data-target="#modalTransfererPlainte" (click)="getCurrentGroupe(groupe)"
+                        *ngIf="groupe"> {{ groupe.nomGroupe }}</a>
+                    </li>
+                  </ul>
+                </div>
+                <div class="dropdown" *ngIf="profil =='GROUP'">
+                  <button mat-raised-button matTooltip="Marquer comme traitée" data-toggle="modal"
+                    data-target="#modalTraiterPlainte" class="btn btn-warning btn-large"
+                    *ngIf="(plainte?.statut?.statut == 'TRANSFERE')">
+                    <span class="material-symbols-outlined">done</span>
+                  </button>
+                  <button mat-raised-button matTooltip="Rejeter la palinte" data-toggle="modal"
+                    data-target="#modalRejetPlainte" class="btn btn-warning btn-large"
+                    *ngIf="(plainte?.statut?.statut == 'TRANSFERE')">
+                    <span class="material-symbols-outlined">block</span>
+                  </button>
+                </div>
+              </div>
+              <br /><br />
+
+              <!--COLL-->
+
+              <div class="" id="collapseExample">
+                <div class="col-md-12">
+                  <form #plainteForm="ngForm" (ngSubmit)="updatePlainte()">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <!-- Champ de saisie du numéro client -->
+                        <mat-form-field class="example-full-width text-dark">
+                          <input matInput type="text" placeholder="Numéro client" name="numeroClient"
+                            [(ngModel)]="plainte.numeroClient" required />
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-md-6">
+                        <label for="statut" style="font-size: 17px">Statut</label>
+                        <mat-select disabled class="form-control white" id="statut" [(ngModel)]="plainte.statutId"
+                          name="statut">
+                          <mat-option *ngFor="let statut of statuts" [value]="statut.id">
+                            {{ statut.statut }}
+                          </mat-option>
+                        </mat-select>
+                      </div>
+
+                      <!--  <div class="form-group col-md-6">
+                        <label for="engagement" style="font-size: 17px;">Engagement</label>
+                        <mat-form-field>
+                          <input #dpInput matInput [min]="toDay" [matDatepicker]="dp" id="engagement"
+                            [(ngModel)]="plainte.engagement" name="engagement" style="font-size: 17px;color: black;"
+                            [disabled]="plainte?.statut?.statut ==='FERME' || (profil !=='GROUP')" required>
+                          <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                          <mat-datepicker #dp startView="year"></mat-datepicker>
+                        </mat-form-field>
+                      </div> -->
+                    </div>
+
+                    <div class="row">
+                      <div class="form-group col-md-11">
+                        <label for="priorite" style="font-size: 17px">Priorité<span>*</span></label>
+                        <mat-select class="form-control white" id="priorite" [(ngModel)]="plainte.prioriteId"
+                          name="priorite" required
+                          [disabled]="profil != 'ADMIN'">
+                          <mat-option *ngFor="let priorite of priorites" [value]="priorite.id">
+                            {{ priorite.priorite }}
+                          </mat-option>
+                        </mat-select>
+                      </div>
+                      <div class="col-md-1" *ngIf="profil =='ADMIN'">
+                        <a class="btn btn-sm btn-white mt-5" data-toggle="modal" data-target="#modalAddPriorite"
+                          mat-raised-button>
+                          <i class="material-icons">add</i>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="form-group col-md-11">
+                        <label for="type" style="font-size: 17px">Type<span>*</span></label>
+                        <mat-select class="form-control white" id="type" [(ngModel)]="plainte.typeId" name="type"
+                          required
+                          [disabled]="profil != 'ADMIN'">
+                          <mat-option *ngFor="let type of types" [value]="type.id">
+                            {{ type.type }}
+                          </mat-option>
+                        </mat-select>
+                      </div>
+                      <div class="col-md-1" *ngIf="profil =='ADMIN'">
+                        <a class="btn btn-sm btn-white mt-5" data-toggle="modal" data-target="#modalType"
+                          mat-raised-button>
+                          <i class="material-icons">add</i>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="form-group col-md-11">
+                        <label for="origine" style="font-size: 17px">Origine<span>*</span></label>
+                        <mat-select class="form-control white" id="origine" [(ngModel)]="plainte.origineId"
+                          name="origine" required
+                          [disabled]="profil != 'ADMIN'">
+                          <mat-option *ngFor="let origine of origines" [value]="origine.id">
+                            {{ origine.origine }}
+                          </mat-option>
+                        </mat-select>
+                      </div>
+
+                      <div class="col-md-1" *ngIf="profil =='ADMIN'">
+                        <a class="btn btn-sm btn-white mt-5" data-toggle="modal" data-target="#modalOrigine"
+                          mat-raised-button>
+                          <i class="material-icons">add</i>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="form-group col-md-9">
+                            <label for="domaine" style="font-size: 17px">Domaine<span>*</span></label>
+                            <mat-select class="form-control white" name="domaine" id="domaine"
+                              (selectionChange)="getSousDomainesByDomaine($event.value)"
+                              (selectionChange)="getDomaineById($event.value)" [(ngModel)]="selectedDomaine.id"
+                              [disabled]="profil != 'ADMIN'">
+                              <mat-option *ngFor="let domaine of domaines" [value]="domaine.id">
+                                {{ domaine.domaine }}
+                              </mat-option>
+                            </mat-select>
+                          </div>
+                          <div class="col-md-1" *ngIf="profil =='ADMIN'">
+                            <a class="btn btn-sm btn-white mt-5" data-toggle="modal" data-target="#modalDomaine"
+                              mat-raised-button>
+                              <i class="material-icons">add</i>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="form-group col-md-10">
+                            <label for="sousDomaine" style="font-size: 17px">Sous Domaine<span>*</span></label>
+                            <mat-select class="form-control white" id="sousDomaine" required
+                              [(ngModel)]="plainte.sousDomaineId" name="sousDomaine"
+                              (selectionChange)="getTypologiesBySousDomaineId(plainte.sousDomaineId)"
+                              (selectionChange)="getOneSousDomaine(plainte.sousDomaineId)"
+                              [disabled]="!selectedDomaine.id || profil !='ADMIN'">
+                              <mat-option *ngFor="let sousDomaine of sousDomaines" [value]="sousDomaine.id">
+                                {{ sousDomaine.sousDomaine }}
+                              </mat-option>
+                            </mat-select>
+                          </div>
+                          <div class="col-md-1" *ngIf="selectedDomaine.id && profil =='ADMIN'">
+                            <a class="btn btn-sm btn-white mt-5" data-toggle="modal" data-target="#modalSousDomaine"
+                              mat-raised-button>
+                              <i class="material-icons">add</i>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="form-group col-md-9">
+                            <label for="typologie" style="font-size: 17px">Typologie<span>*</span></label>
+                            <mat-select class="form-control white" id="typologie" [(ngModel)]="plainte.typologieId"
+                              name="typologie"
+                              [disabled]="!selectedDomaine.id || profil === 'SU' || (profil ==='GROUP')" required>
+                              <mat-option *ngFor="let typologie of typologies" [value]="typologie.id">
+                                {{ typologie.nom }}
+                              </mat-option>
+                            </mat-select>
+                          </div>
+                          <div class="col-md-1" *ngIf="sousDomaineChoose.id && profil =='ADMIN'">
+                            <a class="btn btn-sm btn-white mt-5" data-toggle="modal" data-target="#modalTypologie"
+                              mat-raised-button>
+                              <i class="material-icons">add</i>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="form-group col-md-10">
+                            <label for="origine" style="font-size: 17px">Catégorie<span>*</span></label>
+                            <mat-select class="form-control white" id="categorie" [(ngModel)]="plainte.categorie"
+                              name="categorie" required
+                              [disabled]="profil != 'ADMIN'">
+                              <mat-option value="SERVICE">
+                                SERVICE
+                              </mat-option>
+                              <mat-option value="RESEAU">
+                                RESEAU
+                              </mat-option>
+                            </mat-select>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                    <div class="row">
+                       <!-- Groupe Associé -->
+                      <div class="form-group col-md-6">
+                        <label for="groupeAssocie" style="font-size: 17px">Groupe Associé</label>
+                        <mat-select class="form-control white" id="groupeAssocie" [(ngModel)]="plainte.groupeAssocieId"
+                          name="groupeAssocie" [disabled]="profil !='ADMIN'">
+                          <mat-option *ngFor="let groupeUser of groupeUsers" [value]="groupeUser.id">
+                            {{ groupeUser.nomGroupe }}
+                          </mat-option>
+                        </mat-select>
+                      </div>
+                    
+                    <!-- Complexite -->
+                      <div class="form-group col-md-6" *ngIf="profil =='ADMIN'">
+                        <label for="groupeAssocie" style="font-size: 17px">Complexité *</label>
+                        <mat-select class="form-control white" id="groupeAssocie" [(ngModel)]="plainte.complexiteId"
+                          name="complexite" required >
+                          <mat-option *ngFor="let complexite of  listComplexites" [value]="complexite.id">
+                            {{ complexite.complexite }}
+                          </mat-option>
+                        </mat-select>
+                      </div>
+                    </div>
+                  
+                    <!--MAPPING REGION/DEPARTEMENT/COMMUNE/QUARTIER-->
+                    <div class="row" *ngIf="champsFilterDomaines && champsFilterDomaines.length > 0">
+                      <div class="form-group col-md-6" *ngIf="champsFilterDomainesHas('region')">
+                        <label for="region" style="font-size: 17px">
+                          REGION<span *ngIf="isChampsFilterDomaineRequered('region')">*</span>
+                        </label>
+                        <mat-select class="form-control white" id="region" [(ngModel)]="plainte.regionId" name="region"
+                          (selectionChange)="getDepartement($event.value)" (selectionChange)="newListCommune()"
+                          [required]="isChampsFilterDomaineRequered('region')"
+                          [disabled]="profil != 'ADMIN'">
+                          <mat-option *ngFor="let region of listRegions" [value]="region.id">
+                            {{ region.name }}
+                          </mat-option>
+                        </mat-select>
+                      </div>
+
+                      <div class="form-group col-md-6" *ngIf="champsFilterDomainesHas('departement')">
+                        <label for="departement" style="font-size: 17px">
+                          DEPARTEMENT<span *ngIf="isChampsFilterDomaineRequered('departement')">*</span>
+                        </label>
+                        <mat-select class="form-control white" id="departement" [(ngModel)]="plainte.departementId"
+                          name="departement" (selectionChange)="getCommunes($event.value)"
+                          [required]="isChampsFilterDomaineRequered('departement')"
+                          [disabled]="profil != 'ADMIN'">
+                          <mat-option *ngFor="let dep of listDepartements" [value]="dep.id">
+                            {{ dep.name }}
+                          </mat-option>
+                        </mat-select>
+                      </div>
+
+                      <div class="form-group col-md-6" *ngIf="champsFilterDomainesHas('commune')">
+                        <label for="commune" style="font-size: 17px">
+                          COMMUNE<span *ngIf="isChampsFilterDomaineRequered('commune')">*</span>
+                        </label>
+                        <mat-select class="form-control white" id="commune" [(ngModel)]="plainte.communeId"
+                          name="commune" (selectionChange)="getQuartiers($event.value)"
+                          (selectionChange)="setSelectedCommune($event.value)"
+                          [required]="isChampsFilterDomaineRequered('commune')"
+                          [disabled]="profil != 'ADMIN'">
+                          <mat-option *ngFor="let com of listCommunes" [value]="com.id">
+                            {{ com.name }}
+                          </mat-option>
+                        </mat-select>
+                      </div>
+
+                      <div class="col-md-6" *ngIf="champsFilterDomainesHas('quartier')">
+                        <div class="row">
+                          <div class="form-group col-md-10">
+                            <label for="quartier" style="font-size: 17px">
+                              QUARTIER<span *ngIf="isChampsFilterDomaineRequered('quartier')">*</span>
+                            </label>
+                            <mat-select class="form-control white" id="quartier" [(ngModel)]="plainte.quartierId"
+                              name="quartier" (selectionChange)="setLatLon($event.value)"
+                              [required]="isChampsFilterDomaineRequered('quartier')"
+                              [disabled]="profil != 'ADMIN'">
+                              <mat-option *ngFor="let quartier of listQuartiers" [value]="quartier.id">
+                                {{ quartier.name }}
+                              </mat-option>
+                            </mat-select>
+                          </div>
+                          <div class="col-md-1" *ngIf="selectedCommune.id && profil ==='ADMIN'">
+                            <a class="btn btn-sm btn-white mt-5" data-toggle="modal" data-target="#modalQuartier"
+                              mat-raised-button>
+                              <i class="material-icons">add</i>
+                            </a>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                    <!--MAPPING-->
+
+                    <div class="text-center mt-3">
+                      <button *ngIf="profil ==='ADMIN'"
+                        [disabled]="plainteForm.invalid || plainte?.statut?.statut ==='FERME' || (plainte?.statut?.statut ==='EN ATTENTE')"
+                        type="submit" class="btn btn-primary" (click)="(updatePlainte)">
+                        Mettre à jour
+                      </button>
+                      <button *ngIf="profil ==='ADMIN' && (plainte?.statut?.statut ==='FERME')"
+                        [disabled]="plainteForm.invalid"
+                        type="button" class="btn btn-primary" (click)="modifierPlainte()">
+                        Modifier
+                      </button>
+                    </div>
+                  </form>
+                </div>
+                <!--EN-->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--Piece Jointe-->
+      <div class="col-md-12 mt-3">
+        <div class="card" *ngIf="plainteFiles">
+          <div class="card-header card-header-default card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">cloud_download</i>
+            </div>
+            <h3 class="card-title">Fichiers attachés à la plainte:</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-12"><span class="text-warning">Fichiers attachés : </span><br /><b>
+                  <div *ngFor="let file of plainteFiles">
+                    <li *ngIf="file.nom" class="pointer"><span
+                        style="font-size: large; margin-right: 15px;">{{file.nom}}</span>
+                      <button class="btn btn-sm btn-white " matTooltip="Télécharger le fichier"
+                        (click)="downloadFile(file)"><i class="material-icons">download</i></button>
+                      <button class="btn btn-sm btn-danger" matTooltip="Supprimer le fichier"
+                        (click)="deleteFile(file.id)"><i class="material-icons">close</i></button>
+                    </li>
+                  </div>
+                </b></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" *ngIf="profil !='SU'">
+          <div class="card-header card-header-default card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">cloud_upload</i>
+            </div>
+            <h3 class="card-title">Pièces Jointes</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-12"><span class="text-warning">Pièces jointes: </span><br /><b>
+                  <div class="fileinput fileinput-new text-center" data-provides="fileinput">
+                    <div class="fileinput-preview fileinput-exists thumbnail"></div>
+                    <div>
+                      <button class="btn btn-info btn-file btn-sm " style="height: 40px;">
+                        <input type="file" #file [multiple]="(maxFiles > 1)" id="input-file-now"
+                          (change)="onFileChange($event)" class="dropify-fr" />
+                        joindre des fichiers
+                      </button>
+                      <button *ngIf="(filesEnd)" mat-raised-button class="btn btn-fill btn-large btn-warning"
+                        (click)="ajouterFiles()" [disabled]="plainte?.statut?.statut === 'FERME'">Ajouter</button>
+                    </div>
+                  </div>
+                </b>
+              </div>
+            </div>
+            <div class="row">
+              <div *ngIf="(plainte?.statut?.statut != 'NON PRIS EN CHARGE') " class="col-md-12"><b>
+                  <div *ngFor="let file of plainte.files" (click)="downloadFile(plainte.id,file.nom)">
+                    <li *ngIf="file.nom.includes('Admin')" class="pointer"><span
+                        style="color:rgb(255, 136, 0)">{{file.nom}}</span></li>
+                  </div>
+                </b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!----------------------MODALS------------------------>
+  <div class="modal fade" id="mapAction" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Localiser la plainte</h3>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="">
+                <div class="card-header card-header-warning card-header-icon">
+                  <div class="col-md-12">
+                    <form #upMessageForm="ngForm">
+                      <div class="row">
+                        <div class="col-md-5">
+                          <mat-form-field class="example-full-width">
+                            <input matInput type="text" (mouseout)="updateLatitude()" placeholder="Latitude"
+                              name="latitude" [(ngModel)]="plainte.latitude" required />
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-5">
+                          <mat-form-field class="example-full-width">
+                            <input matInput type="text" (mouseout)="updateLongitude()" placeholder="Longitude"
+                              name="longitude" [(ngModel)]="plainte.longitude" required />
+                          </mat-form-field>
+                        </div>
+                        <div class="col-md-1 mt-3">
+                          <button mat-raised-button type="button" class="btn btn-sm btn-warning"
+                            (click)="resetPosition()">
+                            <i class="material-icons">autorenew</i>
+                          </button>
+                        </div>
+
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="map" id="map"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal pour ajouter un message -->
+  <div class="modal fade" id="modalAction" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Actions</h3>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+
+        </div>
+        <div class="modal-body">
+          <form #actionForm="ngForm" class="form-horizontal">
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <textarea matInput placeholder="Message" name="message" [(ngModel)]="message.message"
+                    required></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button mat-raised-button type="button" class="btn btn-success" data-dismiss="modal"
+            [disabled]="!actionForm.valid" (click)="postMessage()">Valider</button>
+          <button mat-raised-button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Modal pour Tranferer une plainte -->
+  <div class="modal fade" id="modalTransfererPlainte" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Activation de <b>{{currentGroupe?.nomGroupe}}</b></h3>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form #messageEditForm="ngForm" class="form-horizontal">
+
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <textarea matInput placeholder="Message" name="message" [(ngModel)]="message.message"
+                    required></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button class="btn btn-info mr-3" mat-raised-button color="info" type="submit" (click)="transfererPlainte()"
+            data-dismiss="modal" [disabled]="messageEditForm.invalid">
+            Tranférer
+          </button>
+          <button class="btn btn-white" mat-raised-button color="white" type="submit" data-dismiss="modal">
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour Rejeter une plainte -->
+  <div class="modal fade" id="modalRejetPlainte" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">REJETER LA PLAINTE</h3>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form #messageEditForm="ngForm" class="form-horizontal">
+
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <textarea matInput placeholder="Motif" name="message" [(ngModel)]="message.message"
+                    required></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button class="btn btn-info mr-3" mat-raised-button color="info" type="submit" (click)="rejeterPlainte()"
+            data-dismiss="modal" [disabled]="messageEditForm.invalid">
+            Rejeter
+          </button>
+          <button class="btn btn-white" mat-raised-button color="white" type="submit" data-dismiss="modal">
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal FERMETURE PLAINTE -->
+  <div class="modal fade" id="modalFermerPlainte" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">CLÔTURER LA PLAINTE</h3>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+
+        </div>
+        <div class="modal-body">
+          <form #fermetureForm="ngForm" class="form-horizontal">
+            <div class="row">
+              <div class="form-group col-md-12">
+                <label for="statut" style="font-size: 17px">Statut</label>
+                <mat-select class="form-control white" id="statut" [(ngModel)]="selectedStatut" name="statut" required>
+                  <mat-option *ngFor="let statut of statutsFilter" [value]="statut">
+                    {{ statut.statut }}
+                  </mat-option>
+                </mat-select>
+              </div>
+
+            </div>
+            <!--VERBATIM-->
+            <div class="row" *ngIf="(selectedStatut.statut === 'FERME')">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <textarea matInput placeholder="Retour Client" name="Retour Client"
+                    [(ngModel)]="plainte.retourClient"></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+            <!--VERBATIM-->
+
+             <!--CAUSE-->
+             <div class="row" *ngIf="(selectedStatut.statut === 'FERME')">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <textarea matInput placeholder="Cause" name="cause" [(ngModel)]="plainte.cause" required></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+            <!--CAUSE-->
+
+            <!--ACTIONS-->
+            <div class="row"
+              *ngIf="(selectedStatut.statut === 'FERME' || selectedStatut.statut === 'NON PREVU' || selectedStatut.statut === 'EN ATTENTE')">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <textarea matInput placeholder="Actions" name="actions" [(ngModel)]="plainte.actions"
+                    required></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+            <!--ACTIONS-->
+
+            <!-- PORTEUR -->
+            <div class="row"
+              *ngIf="(selectedStatut.statut === 'NON PREVU')">
+              <div class="col-md-12">
+                <label for="groupePorteurId" style="font-size: 17px">Groupe porteur *</label>
+                <mat-select class="form-control white" id="groupePorteurId" [(ngModel)]="plainte.groupePorteurId"
+                  name="groupePorteurId" required>
+                  <mat-option *ngFor="let groupe of listGroupes" [value]="groupe.id">
+                    {{ groupe.nomGroupe }}
+                  </mat-option>
+                </mat-select>
+              </div>
+            </div>
+            <!-- PORTEUR -->
+
+            <!-- DELAI -->
+            <div class="row"
+              *ngIf="(selectedStatut.statut === 'NON PREVU')">
+              <div class="col-md-12">
+                <label for="delai" style="font-size: 17px">Délai</label>
+                <mat-form-field class="example-full-width">
+                  <input matInput [min]="today" name="delai" [matDatepicker]="picker2" placeholder="Délai"
+                    [(ngModel)]="plainte.delai" (click)="picker2.open()">
+                  <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                  <mat-datepicker #picker2></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </div>
+            <!-- DELAI -->
+
+            <div class="row" *ngIf="selectedStatut.statut === 'EN ATTENTE'">
+              <div class="col-md-12">
+                <label for="statut" style="font-size: 17px">Date Réactivation</label>
+                <mat-form-field class="example-full-width">
+                  <input matInput [min]="today" name="dateReactivation" [matDatepicker]="picker1"
+                    placeholder="Choisir une date" [(ngModel)]="plainte.dateReactivation" required
+                    (click)="picker1.open()">
+                  <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                  <mat-datepicker #picker1></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <!--site-->
+            <div class="row" *ngIf="(selectedStatut.statut === 'FERME' && plainte.categorie === 'RESEAU')">
+              <div class="col-md-12">
+                <label for="site" style="font-size: 17px">Site *</label>
+                <ng-multiselect-dropdown class="ng-select" placeholder="Selectionner un site"
+                  [settings]="dropdownSettings" (onDeselect)="deselectSite()" (onSelect)="selectedSite($event)"
+                  [data]="sites" [(ngModel)]="plainte.sites" name="site" required>
+                </ng-multiselect-dropdown>
+              </div>
+            </div>
+            <!--site-->
+
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button mat-raised-button type="button" class="btn btn-success" data-dismiss="modal"
+            [disabled]="!fermetureForm.valid" (click)="fermerPlainte()">Valider</button>
+          <button mat-raised-button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal CONFIRMATION RECUPERATION DE LA PLAINTE -->
+  <div class="modal fade" id="modalRecupererPlainte" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">CONFIRMATION</h3>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+
+        </div>
+        <div class="modal-body">
+          <h6>Vous-voulez vraiment récupérer la plainte ?</h6>
+        </div>
+        <div class="modal-footer">
+          <button mat-raised-button type="button" class="btn btn-success" data-dismiss="modal"
+            (click)="recuperPlainte()">Récupérer</button>
+          <button mat-raised-button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal CONFIRMATION REOUVERTURE DE LA PLAINTE -->
+  <div class="modal fade" id="modalReOuvrirPlainte" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">CONFIRMATION</h3>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+
+        </div>
+        <div class="modal-body">
+          <h6>Vous-voulez vraiment reprendre la plainte ?</h6>
+        </div>
+        <div class="modal-footer">
+          <button mat-raised-button type="button" class="btn btn-success" data-dismiss="modal"
+            (click)="reOuvrirPlainte()">Valider</button>
+          <button mat-raised-button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour Tranferer une plainte -->
+  <div class="modal fade" id="modalTraiterPlainte" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">PLAINTE TRAITEE</h3>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form #messageEditForm="ngForm" class="form-horizontal">
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <textarea matInput placeholder="Message" name="message" [(ngModel)]="message.message"
+                    required></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button class="btn btn-info mr-3" mat-raised-button color="info" type="submit"
+            (click)="plainteTraiteeByGroup()" data-dismiss="modal" [disabled]="messageEditForm.invalid">
+            Valider
+          </button>
+          <button class="btn btn-white" mat-raised-button color="white" type="submit" data-dismiss="modal">
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal pour ajouter une priorité -->
+  <div class="modal fade" id="modalAddPriorite" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Ajouter une priorité</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form #prioriteForm="ngForm" class="form-horizontal">
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="text" placeholder="Priorité" name="priorite" [(ngModel)]="priorite.priorite"
+                    required />
+                </mat-form-field>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button class="orange-button" mat-raised-button color="primary" type="submit" (click)="onSubmitPriorite()"
+            data-dismiss="modal" [disabled]="prioriteForm.invalid">
+            Ajouter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal pour ajouter un type -->
+  <div class="modal fade" id="modalType" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Ajouter un type</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form #typeForm="ngForm" class="form-horizontal">
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="text" placeholder="Nom" name="type" [(ngModel)]="type.type" required />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+              <button class="orange-button" mat-raised-button color="primary" type="submit" (click)="onSubmitType()"
+                data-dismiss="modal" [disabled]="typeForm.invalid">
+                Ajouter
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal pour ajouter une origine -->
+  <div class="modal fade" id="modalOrigine" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Ajouter une origine</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form #origineForm="ngForm" class="form-horizontal">
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="text" placeholder="Origine" name="origine" [(ngModel)]="origine.origine"
+                    required />
+                </mat-form-field>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button class="orange-button" mat-raised-button color="primary" type="submit" (click)="onSubmitOrigine()"
+            data-dismiss="modal" [disabled]="origineForm.invalid">
+            Ajouter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal MODIFICATION PLAINTE CLOTURER -->
+  <div class="modal fade" id="modificationPlainte" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">MODIFIER LA PLAINTE</h3>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+
+        </div>
+        <div class="modal-body">
+          <form #modifPlainteForm="ngForm" class="form-horizontal">
+            <!--VERBATIM-->
+            <div class="row" *ngIf="(plainte?.statut?.statut === 'FERME')">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <textarea matInput placeholder="Retour Client" name="Retour Client"
+                    [(ngModel)]="plainte.retourClient"></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+            <!--VERBATIM-->
+
+             <!--CAUSE-->
+             <div class="row" *ngIf="(plainte?.statut?.statut === 'FERME')">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <textarea matInput placeholder="Cause" name="cause" [(ngModel)]="plainte.cause" required></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+            <!--CAUSE-->
+
+            <!--ACTIONS-->
+            <div class="row"
+              *ngIf="(plainte?.statut?.statut === 'FERME' || plainte?.statut?.statut === 'NON PREVU' || plainte?.statut?.statut === 'EN ATTENTE')">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <textarea matInput placeholder="Actions" name="actions" [(ngModel)]="plainte.actions"
+                    required></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+            <!--ACTIONS-->
+
+            <!-- PORTEUR -->
+            <div class="row"
+              *ngIf="(plainte?.statut?.statut === 'NON PREVU')">
+              <div class="col-md-12">
+                <label for="groupePorteurId" style="font-size: 17px">Groupe porteur *</label>
+                <mat-select class="form-control white" id="groupePorteurId" [(ngModel)]="plainte.groupePorteurId"
+                  name="groupePorteurId" required>
+                  <mat-option *ngFor="let groupe of listGroupes" [value]="groupe.id">
+                    {{ groupe.nomGroupe }}
+                  </mat-option>
+                </mat-select>
+              </div>
+            </div>
+            <!-- PORTEUR -->
+
+            <!-- DELAI -->
+            <div class="row"
+              *ngIf="(plainte?.statut?.statut === 'NON PREVU')">
+              <div class="col-md-12">
+                <label for="delai" style="font-size: 17px">Délai</label>
+                <mat-form-field class="example-full-width">
+                  <input matInput [min]="today" name="delai" [matDatepicker]="picker2" placeholder="Délai"
+                    [(ngModel)]="plainte.delai" (click)="picker2.open()">
+                  <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                  <mat-datepicker #picker2></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </div>
+            <!-- DELAI -->
+
+            <div class="row" *ngIf="plainte?.statut?.statut === 'EN ATTENTE'">
+              <div class="col-md-12">
+                <label for="statut" style="font-size: 17px">Date Réactivation</label>
+                <mat-form-field class="example-full-width">
+                  <input matInput [min]="today" name="dateReactivation" [matDatepicker]="picker1"
+                    placeholder="Choisir une date" [(ngModel)]="plainte.dateReactivation" required
+                    (click)="picker1.open()">
+                  <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                  <mat-datepicker #picker1></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <!--site-->
+            <div class="row" *ngIf="(plainte?.statut?.statut === 'FERME' && plainte.categorie === 'RESEAU')">
+              <div class="col-md-12">
+                <label for="site" style="font-size: 17px">Site *</label>
+                <ng-multiselect-dropdown class="ng-select" placeholder="Selectionner un site"
+                  [settings]="dropdownSettings" (onDeselect)="deselectSite()" (onSelect)="selectedSite($event)"
+                  [data]="sites" [(ngModel)]="plainte.sites" name="site" required>
+                </ng-multiselect-dropdown>
+              </div>
+            </div>
+            <!--site-->
+
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button mat-raised-button type="button" class="btn btn-success" data-dismiss="modal"
+            [disabled]="!modifPlainteForm.valid" (click)="modifierPlainte()">Valider</button>
+          <button mat-raised-button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- Modal MODIFICATION PLAINTE CLOTURER -->
+
+  <!-- Modal pour ajouter un domaine -->
+  <div class="modal fade" id="modalDomaine" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Ajouter un domaine</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form #domaineForm="ngForm" class="form-horizontal">
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="text" placeholder="Domaine" name="domaine_" [(ngModel)]="domaine.domaine"
+                    required />
+                </mat-form-field>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button class="orange-button" mat-raised-button color="primary" type="submit" (click)="onSubmitDomaine()"
+            data-dismiss="modal" [disabled]="domaineForm.invalid">
+            Ajouter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour ajouter un sous-domaine -->
+  <div class="modal fade" id="modalSousDomaine" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Ajouter un sous-domaine</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form #sousDomaineForm="ngForm" class="form-horizontal">
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="text" placeholder="sous-domaine" name="sousDomaine"
+                    [(ngModel)]="sousDomaine.sousDomaine" required />
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="text" placeholder="Domaine" name="domaine__" [(ngModel)]="domaineName.domaine"
+                    readonly />
+                </mat-form-field>
+              </div>
+            </div>
+
+          </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button class="orange-button" mat-raised-button color="primary" type="submit" (click)="onSubmitSousDomaine()"
+            data-dismiss="modal" [disabled]="sousDomaineForm.invalid">
+            Ajouter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour ajouter un quartier -->
+  <div class="modal fade" id="modalQuartier" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Ajouter un quartier</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form #quartierForm="ngForm" class="form-horizontal">
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="text" placeholder="Nom" name="quartier_" [(ngModel)]="quartier.name" required />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="text" placeholder="Longitude" name="lon" [(ngModel)]="quartier.lon" required />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="text" placeholder="Latitude" name="lat" [(ngModel)]="quartier.lat" required />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="number" placeholder="Population" name="population"
+                    [(ngModel)]="quartier.population" />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="text" placeholder="Commune" name="commune_" [(ngModel)]="selectedCommune.name"
+                    readonly />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+              <button class="orange-button" mat-raised-button color="primary" type="submit" (click)="onSubmitQuartier()"
+                data-dismiss="modal" [disabled]="quartierForm.invalid">
+                Ajouter
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour ajouter une typologie -->
+  <div class="modal fade" id="modalTypologie" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Ajouter une typologie</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form #groupForm="ngForm" class="form-horizontal">
+            <div class="row">
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="text" placeholder="Nom" name="nom" [(ngModel)]="typologie.nom" required />
+                </mat-form-field>
+              </div>
+
+              <div class="col-md-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="text" placeholder="Sous-Domaine" name="sousDomaine"
+                    [(ngModel)]="sousDomaineChoose.sousDomaine" value="sousDomaineChoose.sousDomaine" readonly />
+                </mat-form-field>
+              </div>
+
+            </div>
+
+            <div class="modal-footer justify-content-center">
+              <button class="orange-button" mat-raised-button color="primary" type="submit"
+                (click)="onSubmitTypologie()" data-dismiss="modal" [disabled]="groupForm.invalid">
+                Ajouter
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>

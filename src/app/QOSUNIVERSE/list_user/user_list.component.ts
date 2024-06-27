@@ -6,7 +6,7 @@ import {
   ViewChildren,
 } from "@angular/core";
 import { Router } from "@angular/router";
-import { DataTableDirective } from "angular-datatables";
+// import { DataTableDirective } from "angular-datatables";
 import { Subject } from "rxjs";
 import { PlainteService } from "../services/plainte.service";
 import { Plainte } from "../models/plainte";
@@ -14,6 +14,8 @@ import { AuthService } from "src/app/pages/auth/auth.service";
 import { AgentService } from "../services/agent.service";
 import { Agent } from "../models/agent";
 import * as moment from "moment";
+
+declare const $: any;
 
 @Component({
   selector: "app-user_list",
@@ -87,8 +89,8 @@ export class UserListComponent implements OnInit {
   plaintesEnAttente;
   plaintesTraiter;
   
-  @ViewChildren(DataTableDirective)
-  dtElements: QueryList<DataTableDirective>;
+  // @ViewChildren(DataTableDirective)
+  // dtElements: QueryList<DataTableDirective>;
 
   plaintes: Plainte[] = [];
   plaintesGroupe: Plainte[] = [];
@@ -226,10 +228,11 @@ export class UserListComponent implements OnInit {
           this.plaintesEnAttente = res.filter((plainte) => plainte.statut.statut === 'EN ATTENTE').length;
           this.plaintesTraiter = res.filter((plainte) => plainte.statut.statut === 'TRAITE').length;
 
-          this.dtTriggerAutre.next();
-          this.dtTrigger.next();
+          this.dtTriggerAutre.next(null);
+          this.dtTrigger.next(null);
           this.ready = true;
           this.searching = false;
+          this.reinitializePlainteDataTable()
         },
         (error) => {
           this.searching = false;
@@ -249,9 +252,10 @@ export class UserListComponent implements OnInit {
           this.plaintesPrequalifier = res.filter((plainte) => plainte.statut.statut === 'NON PRIS EN CHARGE').length;
           this.plaintesNonPrevu = res.filter((plainte) => plainte.statut.statut === 'NON PREVU').length;
           this.plaintesEnAttente = res.filter((plainte) => plainte.statut.statut === 'EN ATTENTE').length;
-          this.dtTrigger.next();
+          this.dtTrigger.next(null);
           this.ready = true;
           this.searching = false;
+          this.reinitializeMesPlainteDataTable()
         },
         (error) => {
           this.searching = false;
@@ -266,5 +270,27 @@ export class UserListComponent implements OnInit {
     this.router.navigate(["qosUniverse/plainte", plainteId]);
   }
 
+  private reinitializeMesPlainteDataTable(): void {
+    // Destroy existing DataTable instance
+    const table = $('#mesPlaintes-table').DataTable();
+    if (table) {
+      table.clear().destroy();
+    }
+    // Reinitialize DataTable after a short delay to ensure Angular has updated the view
+    setTimeout(() => {
+      $('#mesPlaintes-table').DataTable(this.dtOptions);
+    }, 100);
+  }
+  private reinitializePlainteDataTable(): void {
+    // Destroy existing DataTable instance
+    const table = $('plaintes-table').DataTable();
+    if (table) {
+      table.clear().destroy();
+    }
+    // Reinitialize DataTable after a short delay to ensure Angular has updated the view
+    setTimeout(() => {
+      $('#plaintes-table').DataTable(this.dtOptions);
+    }, 100);
+  }
  
 }

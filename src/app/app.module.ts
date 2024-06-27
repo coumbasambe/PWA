@@ -55,8 +55,8 @@ import { NotificationService } from './shared/services/notifications';
 import { AuthGuard } from './pages/auth/auth-guard.service';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { PlainteComponent } from './QOSUNIVERSE/plainte/plainte.component';
-import { QOSUNIVERSEModule } from './QOSUNIVERSE/qosuniverse.module';
-import { QosUniverseService } from './shared/qos-universe-service.service';
+import { NotificationComponent } from './notification/notification.component';
+import {qosUniverseService} from './shared/qosUniverseService';
 
 @NgModule({
   exports: [
@@ -98,8 +98,7 @@ import { QosUniverseService } from './shared/qos-universe-service.service';
       // or after 30 seconds (whichever comes first).
       registrationStrategy: 'registerWhenStable:30000'
     })
-  ],
-  
+  ]
 })
 export class MaterialModule {}
 
@@ -110,7 +109,6 @@ export class MaterialModule {}
         FormsModule,
         RouterModule.forRoot(AppRoutes),
         HttpClientModule,
-        QOSUNIVERSEModule,
         MaterialModule,
         SidebarModule,
         NavbarModule,
@@ -120,7 +118,8 @@ export class MaterialModule {}
     declarations: [
         AppComponent,
         AdminLayoutComponent,
-        AuthLayoutComponent    
+        AuthLayoutComponent ,
+        NotificationComponent   
       ],
     providers : [
       MatNativeDateModule,
@@ -131,7 +130,7 @@ export class MaterialModule {}
       AuthService,
       AuthGuard,
       ActionGroupService,
-      QosUniverseService
+      qosUniverseService
     ],
     bootstrap:    [ AppComponent ]
 })

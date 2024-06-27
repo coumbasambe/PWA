@@ -1,14 +1,14 @@
 import { HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-// import { Observable } from "rxjs-compat";
+import { Observable } from "rxjs";
 import { BaseService } from "src/app/shared/base.service";
-import { QosUniverseService } from "src/app/shared/qos-universe-service.service";
+import { qosUniverseService } from "src/app/shared/qosUniverseService";
 @Injectable({
   providedIn: "root",
 })
 export class PlainteService {
 
-  constructor(private qosUniverseService: QosUniverseService, private baseService: BaseService) { }
+  constructor(private qosUniverseService: qosUniverseService, private baseService: BaseService) { }
   // 'https://apis.jambars.orange-sonatel.com/qosuniverse/plainte-groupes?filter={"where":{"groupeId":"6581c57b9e3a404b7fc09c9e"},"include": [{"relation": "plainte","scope": {"include": [{"relation":"origine"},{"relation":"priorite"},{"relation":"sousDomaine"},{"relation":"type"}]}},{"relation": "statut"},{"relation": "groupe"}]}'
 
   // Requêtes plaintes
@@ -56,9 +56,9 @@ export class PlainteService {
   patchPlainte(id, data) {
     return this.qosUniverseService.patch("plaintes", id, data);
   }
-  // plaintesCount(): Observable<number> {
-  //   return this.qosUniverseService.get("plaintes/count");
-  // }
+  plaintesCount(): Observable<number> {
+    return this.qosUniverseService.get("plaintes/count");
+  }
   updatePlainte(id, data) {
     return this.qosUniverseService.patch("plaintes", id, data);
   }

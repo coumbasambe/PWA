@@ -1,0 +1,486 @@
+<!-- <app-plainte_kpi [plaintesTotale]="plainteKpi?.plaintesTotale" [plaintesEnCours]="plainteKpi?.plaintesEnCours"
+  [plaintesCloturees]="plainteKpi?.plaintesCloturees" [plaintesPrequalifier]="plainteKpi?.plaintesPrequalifier"
+  [plaintesNonPrevu]="plainteKpi?.plaintesNonPrevu" [plaintesTraiter]="plainteKpi?.plaintesTraiter"
+  [plaintesEnAttente]="plainteKpi?.plaintesEnAttente"></app-plainte_kpi> -->
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-warning card-header-icon">
+        <h4 class="card-title"><!-- Plaintes ({{ plaintes.length }}) --></h4>
+      </div>
+      <div class="card-body">
+        <form class="row align-items-center" #formPeriode="ngForm" (ngSubmit)="onPeriodeChosed()">
+          <div class="col-md-2">
+            <mat-form-field>
+              <input #dpInput matInput [matDatepicker]="dp2" id="dateDebut" [(ngModel)]="periodeForm.dateDebut"
+                name="dateDebut" placeholder="Date de début" required>
+              <mat-datepicker-toggle matSuffix [for]="dp2"></mat-datepicker-toggle>
+              <mat-datepicker #dp2 startView="year"></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-2">
+            <mat-form-field>
+              <input #dpInput matInput [matDatepicker]="dp" id="dateFin" [(ngModel)]="periodeForm.dateFin"
+                required placeholder="Date de fin" [min]="periodeForm.dateDebut"
+                [disabled]="!periodeForm.dateDebut" name="dateFin">
+              <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+              <mat-datepicker #dp startView="year"></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <div class="col">
+            <button type="submit" [disabled]="(!formPeriode.valid) || (searching && !ready)"
+              class="btn btn-primary">
+              <i class="material-icons">date_range</i>
+            </button>
+            <button type="button" (click)="resetForm()"
+              [disabled]="(!formPeriode.valid) || (searching && !ready)" class="btn btn-white ml-3"
+              mat-raised-button color="white">
+              <i class="material-icons">restart_alt</i>
+            </button>
+          </div>
+        </form>
+        <div class="row">
+          <div class="col-md-12" *ngIf="searchingKpi && !readyKpi">
+            <!-- Barre de progression pendant la recherche -->
+            <mat-progress-bar color="warn" mode="indeterminate"></mat-progress-bar>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+          
+            <div class="card">
+              <div class="card-header black-card card-header-tabs">
+                <div class="nav-tabs-navigation">
+                  <div class="nav-tabs-wrapper">
+                    <ul class="home-plainte nav nav-tabs" data-tabs="tabs">
+                      <li class="nav-item">
+                        <a class="nav-link" href="#tlp" (click)="getPlaintes()" data-toggle="tab">
+                          <i class="material-icons">clear_all</i>
+                          TOUTES LES PLAINTES <b>({{plainteKpi.plaintesTotale}})</b>
+                          <div class="ripple-container"></div>
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link active" href="#npec" data-toggle="tab">
+                          <i class="material-icons">visibility_off</i>
+                          NON QUALIFIEES <b>({{plaintesNonQualifier?.length}})</b>
+                          <div class="ripple-container"></div>
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="#monbacklog" data-toggle="tab">
+                          <i class="material-icons">outgoing_mail</i>
+                          Mon Backlog ({{plaintesBacklog.length}}) <b></b>
+                          <div class="ripple-container"></div>
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" (click)="getPlaintes()" href="#ouvert" data-toggle="tab">
+                          <i class="material-icons">done_all</i> QUALIFIEES <b>({{plainteKpi.plaintesQualifier}})</b>
+                          <div class="ripple-container"></div>
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="#plaintessuivies" data-toggle="tab">
+                          <i class="material-icons">search</i>
+                          SUIVIES <b>({{plaintesSuivies.length}})</b>
+                          <div class="ripple-container"></div>
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="#qos-report" data-toggle="tab">
+                          <i class="material-icons">dashboard</i>
+                          REPORTING
+                          <div class="ripple-container"></div>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- Table et formulaire -->
+              <div class="card-body">
+                <div class="tab-content" style="cursor: pointer;">
+                  <div class="tab-pane" id="tlp">
+                    <div class="container-fluid">
+                      <div class="table-responsive">
+                        <div class="row">
+                          <div class="col-md-12" *ngIf="searching && !ready">
+                            <!-- Barre de progression pendant la recherche -->
+                            <mat-progress-bar color="warn" mode="indeterminate"></mat-progress-bar>
+                          </div>
+                        </div>
+                        <!-- Tableau des plaintes -->
+                        <table style="width: 100%"
+                        id="tlpAdmin-table"
+                          class="table table-striped table-no-bordered table-hover">
+                          <thead>
+                            <tr>
+                              <th *ngIf="superAdminProfil">#</th>
+                              <th>DATE CREATION</th>
+                              <th>OBJET</th>
+                              <th>STATUT</th>
+                              <th>NUMERO</th>
+                              <th>DESCRIPTION</th>
+                              <th>TYPE</th>
+                              <th>DOMAINE</th>
+                              <th>SOUS-DOMAINE</th>
+                              <th>TYPOLOGIE</th>
+                              <th>PRIORITE</th>
+                              <th>GROUPE</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <!-- Boucle sur chaque plainte -->
+                            <ng-container *ngFor="let plainte of plaintes">
+                              <tr>
+                                <!-- Affichage des informations de la plainte -->
+                                <td *ngIf="superAdminProfil"><a class="btn btn-sm btn-danger"
+                                    (click)="setIdPlainteToDelete(plainte)" data-toggle="modal"
+                                    data-target="#deletePlainteModal" mat-raised-button>
+                                    <i class="material-icons">delete</i>
+                                  </a></td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{plainte.dateReception | date : "dd/MM/yyyy HH:mm"}}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  <span *ngIf="plainte.plainteNumber">[#{{plainte.plainteNumber}}].</span> {{
+                                  plainte.objet }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte?.statut?.statut }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte.numeroClient }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)" *ngIf="plainte.description.length > 40">
+                                  {{ plainte.description.slice(0, 40) }}...
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)" *ngIf="plainte.description.length <= 40">
+                                  {{ plainte.description }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte?.type?.type }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte?.sousDomaine?.domaine?.domaine }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte?.sousDomaine?.sousDomaine}}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte?.typologie?.nom}}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte?.priorite?.priorite }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte.activeGroupe }}
+                                </td>
+                              </tr>
+                            </ng-container>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab-pane active" id="npec">
+                    <div class="container-fluid">
+                      <div class="table-responsive">
+                        <!--DISPATCHER-->
+                        <div class="dropdown" *ngIf="selectedPlaintes.length > 0">
+                          <button mat-raised-button href="#" class="dropdown-toggle btn btn-primary btn-sm"
+                            matTooltip="Dispatcher les plaintes sélectionnées" [matTooltipShowDelay]="1"
+                            [matTooltipHideDelay]="2"
+                            aria-label="Button that displays a tooltip with a customized delay in showing and hiding"
+                            data-toggle="dropdown">
+                            <span class="material-symbols-outlined">share</span>
+                            <b class="caret"></b>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-left">
+                            <li class="dropdown-header">Liste des Agents</li>
+                            <li *ngFor="let agent of agents">
+                              <a data-toggle="dropdown"
+                                (click)="dispatcherPlaintes(agent)">{{agent.jambarsInfos?.prenom}}
+                                {{agent.jambarsInfos?.nom}} </a>
+                            </li>
+                          </ul>
+                        </div>
+                        <!--DISPATCHER-->
+                        <!-- Tableau des plaintes -->
+                        <table style="width: 100%"
+                        id="npecAdmin-table"
+                          class="table table-striped table-no-bordered table-hover">
+                          <thead>
+                            <tr>
+                              <th>DISPATCH</th>
+                              <th>DATE CREATION</th>
+                              <th>OBJET</th>
+                              <th>NUMERO</th>
+                              <th>PORTEUR</th>
+                              <th>DESCRIPTION</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <!-- Boucle sur chaque plainte -->
+                            <ng-container *ngFor="let plainte of plaintesNonQualifier">
+                              <tr
+                                *ngIf="(plainte?.statut?.statut =='NON PRIS EN CHARGE') || (plainte?.statut?.statut ==undefined)"
+                                [ngClass]="{'read': !plainte.lu}">
+                                <!-- Affichage des informations de la plainte -->
+                                <td>
+                                  <span>
+                                    <label for="dispatch">
+                                      <input type="checkbox" id="dispatch" [hidden]="plainte.porteur"
+                                        [checked]="isSelected(plainte)" (change)="selectedPlainte(plainte)" />
+                                    </label>
+                                  </span>
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{plainte.dateReception | date :
+                                  "dd/MM/yyyy HH:mm"}}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  <span *ngIf="plainte.plainteNumber">[#{{plainte.plainteNumber}}].</span> {{
+                                  plainte.objet }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte.numeroClient }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  <b>{{plainte.porteur}}</b>
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)" *ngIf="plainte.description.length > 40">
+                                  {{ plainte.description.slice(0, 40) }}...
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)" *ngIf="plainte.description.length <= 40">
+                                  {{ plainte.description }}
+                                </td>
+
+                              </tr>
+                            </ng-container>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab-pane" id="monbacklog">
+                    <div class="container-fluid">
+                      <div class="table-responsive">
+                        <!-- Tableau des plaintes -->
+                        <table style="width: 100%"
+                        id="monbacklog-table"
+                          class="table table-striped table-no-bordered table-hover">
+                          <thead>
+                            <tr>
+                              <th>DATE CREATION</th>
+                              <th>OBJET</th>
+                              <th>NUMERO</th>
+                              <th>DESCRIPTION</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <!-- Boucle sur chaque plainte -->
+                            <ng-container *ngFor="let plainte of plaintesBacklog">
+                              <!-- <tr *ngIf="(plainte?.statut?.statut !='NON PRIS EN CHARGE') || (plainte?.statut?.statut ==undefined)"> -->
+                              <tr>
+                                <!-- Affichage des informations de la plainte -->
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{plainte.dateReception | date : "dd/MM/yyyy HH:mm"}}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  <span *ngIf="plainte.plainteNumber">[#{{plainte.plainteNumber}}].</span> {{
+                                  plainte.objet }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte.numeroClient }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)" *ngIf="plainte.description.length > 40">
+                                  {{ plainte.description.slice(0, 40) }}...
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)" *ngIf="plainte.description.length <= 40">
+                                  {{ plainte.description }}
+                                </td>
+                              </tr>
+                            </ng-container>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab-pane" id="ouvert">
+                    <div class="container-fluid">
+                      <div class="table-responsive">
+                        <div class="row">
+                          <div class="col-md-12" *ngIf="searching && !ready">
+                            <!-- Barre de progression pendant la recherche -->
+                            <mat-progress-bar color="warn" mode="indeterminate"></mat-progress-bar>
+                          </div>
+                        </div>
+                        <!-- Tableau des plaintes -->
+                        <table style="width: 100%"
+                        id="ouvertAdmin-table"
+                          class="table table-striped table-no-bordered table-hover">
+                          <thead>
+                            <tr>
+                              <th>DATE CREATION</th>
+                              <th>OBJET</th>
+                              <th>STATUT</th>
+                              <th>NUMERO</th>
+                              <th>DESCRIPTION</th>
+                              <th>DOMAINE</th>
+                              <th>PRIORITE</th>
+                              <th>GROUPE</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <!-- Boucle sur chaque plainte -->
+                            <ng-container *ngFor="let plainte of plaintes">
+                              <tr
+                                *ngIf="(plainte?.statut?.statut !='NON PRIS EN CHARGE') && (plainte?.statut?.statut!=undefined) ">
+                                <!-- Affichage des informations de la plainte -->
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{
+                                  plainte.dateReception
+                                  | date : "dd/MM/yyyy HH:mm"
+                                  }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  <span *ngIf="plainte.plainteNumber">[#{{plainte.plainteNumber}}].</span> {{
+                                  plainte.objet }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte?.statut?.statut }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte.numeroClient }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)" *ngIf="plainte.description.length > 40">
+                                  {{ plainte.description.slice(0, 40) }}...
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)" *ngIf="plainte.description.length <= 40">
+                                  {{ plainte.description }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte?.sousDomaine?.domaine?.domaine }}
+                                </td>
+
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte?.priorite?.priorite }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte.activeGroupe }}
+                                </td>
+                              </tr>
+                            </ng-container>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab-pane " id="plaintessuivies">
+                    <div class="container-fluid">
+                      <div class="table-responsive">
+                        <!-- Tableau des plaintes -->
+                        <table style="width: 100%"
+                        id="suiviesAdmin-table"
+                          class="table table-striped table-no-bordered table-hover">
+                          <thead>
+                            <tr>
+                              <th>DATE CREATION</th>
+                              <th>OBJET</th>
+                              <th>STATUT</th>
+                              <th>NUMERO</th>
+                              <th>DESCRIPTION</th>
+                              <th>DOMAINE</th>
+                              <th>PRIORITE</th>
+                              <th>GROUPE</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <!-- Boucle sur chaque plainte -->
+                            <ng-container *ngFor="let plainte of plaintesSuivies">
+                              <tr>
+                                <!-- Affichage des informations de la plainte -->
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{
+                                  plainte.dateReception
+                                  | date : "dd/MM/yyyy HH:mm"
+                                  }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  <span *ngIf="plainte.plainteNumber">[#{{plainte.plainteNumber}}].</span> {{
+                                  plainte.objet }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte?.statut?.statut }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte.numeroClient }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)" *ngIf="plainte.description.length > 40">
+                                  {{ plainte.description.slice(0, 40) }}...
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)" *ngIf="plainte.description.length <= 40">
+                                  {{ plainte.description }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte?.sousDomaine?.domaine?.domaine }}
+                                </td>
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte?.priorite?.priorite }}
+                                </td>
+
+                                <td (click)="goToPlainteDetails(plainte.id)">
+                                  {{ plainte.activeGroupe }}
+                                </td>
+
+                              </tr>
+                            </ng-container>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab-pane " id="qos-report">
+                    <div class="container-fluid">
+                      <!-- <app-qos-report groupeName="SMC-N/GPC" ></app-qos-report> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal CONFIRMATION DE SUPRESSION DE LA PLAINTE -->
+<div class="modal fade" id="deletePlainteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">CONFIRMATION</h3>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+
+      </div>
+      <div class="modal-body">
+        <h4>Vous-voulez vraiment Supprimer cette plainte [#{{plainteToDelete?.plainteNumber}}] ?</h4>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-success" data-dismiss="modal"
+          (click)="deletedPlainte()">Valider</button>
+        <button mat-raised-button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+      </div>
+
+    </div>
+  </div>
+</div>

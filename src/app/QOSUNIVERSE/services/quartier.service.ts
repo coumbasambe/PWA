@@ -1,6 +1,5 @@
 import { HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs-compat";
 import { BaseService } from "src/app/shared/base.service";
 import { qosUniverseService } from "src/app/shared/qosUniverseService";
 import { Quartier } from "../models/quartier";

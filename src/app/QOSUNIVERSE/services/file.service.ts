@@ -1,8 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Http, Headers, RequestOptions } from '@angular/http';
-import { Observable } from 'rxjs/Rx';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { HttpHeaders } from '@angular/common/http';
 import { qosUniverseService } from "src/app/shared/qosUniverseService";
 @Injectable({
   providedIn: "root",
@@ -10,12 +7,12 @@ import { qosUniverseService } from "src/app/shared/qosUniverseService";
 export class FileService {
   constructor(private qosUniverseService: qosUniverseService) {}
   upload(files){
-    let headers = new Headers();
+    let headers = new HttpHeaders();
     //console.log(files);
-    let options = new RequestOptions({ headers: headers });
-    return  this.qosUniverseService.post('files', files,options)
+    // let options = new RequestOptions({ headers: headers });
+    return  this.qosUniverseService.post('files', files,headers)
       .map(response => response.json())
-      .catch(error => Observable.throw(error));
+      .catch(error => console.log(error));
 
   }
 

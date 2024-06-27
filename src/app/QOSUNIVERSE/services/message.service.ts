@@ -16,14 +16,14 @@ export class MessageService {
     );
   }
   postMessage(message) {
-    return this.qosUniverseService.post("/messages", message);
+    return this.qosUniverseService.post("messages", message);
   }
 
   patchMessage(id, data) {
     return this.qosUniverseService.patch("messages", id, data);
   }
   deleteMessage(id) {
-    return this.qosUniverseService.delete("/messages", id);
+    return this.qosUniverseService.delete("messages", id);
   }
 
 }
